@@ -1,0 +1,12 @@
+Index: CommonLocal.php
+===================================================================
+--- CommonLocal.php	(revision 13)
++++ CommonLocal.php	(working copy)
+@@ -71,6 +71,7 @@
+ 
+ # Semantic Mediawiki 
+ require_once("$IP/extensions/SemanticMediaWiki/includes/SMW_Settings.php");
++require_once("$IP/extensions/WikiConfig/ConfigPoweredBy.php");
+ 
+ # Set up SMW searchable namespaces 
+ foreach($lockdownSMWSearchable as $taddlinkkey)
