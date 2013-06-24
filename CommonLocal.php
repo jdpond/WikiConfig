@@ -44,14 +44,15 @@ $wgWhitelistRead = array( 	"Main Page","Special:Userlogin","Special:ConfirmEmail
 
 #Set Default Timezone
 $wgLocaltimezone = 'America/New_York';
-$oldtz = getenv("TZ");
+# $oldtz = getenv("TZ");
 
-putenv("TZ=$wgLocaltimezone");
-date_default_timezone_set('America/New_York');
+# putenv("TZ=$wgLocaltimezone");
+date_default_timezone_set($wgLocaltimezone);
+
 # Versions before 1.7.0 used $wgLocalTZoffset as hours.
 # After 1.7.0 offset as minutes
-$wgLocalTZoffset = date("Z") / 60;
-putenv("TZ=$oldtz");
+# $wgLocalTZoffset = date("Z") / 60;
+# putenv("TZ=$oldtz");
 
 # remove the link to the talk page for non-logged in users
 $wgShowIPinHeader = false;
