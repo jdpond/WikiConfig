@@ -1,6 +1,6 @@
-	@echo off
+ 	@echo off
 	setlocal
-	set ConfigFile=Extensions.conf
+	set ConfigFile=extensions/WikiConfig/Extensions.conf
 	set BranchVer=false
 :startloopp
 	if "%1"=="" goto loopparams
@@ -23,7 +23,6 @@
 :loopparams
 	if not exist %ConfigFile% (
 		echo Media Extension File List %ConfigFile% does not exist - exiting
-		pause
 		goto :EOF
 	)
 	echo Starting MediaWiki Extension Loader from %ConfigFile% at %time% %date% > ExtensionLoader.log
@@ -33,56 +32,48 @@
 goto :EOF
 
 :parseit
-	if not exist %1\.git (
-		Echo Cloning %1
-		Echo Cloning %1 >>ExtensionLoader.log
-		set CheckoutStatus=-n
-		if "%BranchVer%" == "false" set CheckoutStatus=
-		echo @git clone %CheckoutStatus% ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki/extensions/%1.git
-		pause
-		echo @git clone %CheckoutStatus% ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki/extensions/%1.git >>ExtensionLoader.log
-		@git clone %CheckoutStatus% ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki/extensions/%1.git >>ExtensionLoader.log
-		if exist %1\.git (
-			call :gitreview %1
-			if NOT "%BranchVer%" == "false" (
-				pushd %1
-				echo branching: %BranchVer% >>ExtensionLoader.log
-				echo @git.exe checkout -B %BranchVer% remotes/origin/%BranchVer% 
-				echo @git.exe checkout -B %BranchVer% remotes/origin/%BranchVer% >>ExtensionLoader.log
-				@git.exe checkout -B %BranchVer% remotes/origin/%BranchVer% >>ExtensionLoader.log
-				popd
-			)
-
-		) else (
-			mkdir %1
-			echo **** %1 is not in git **** trying svn
-			call :trySVN %1
-		)		
-	) else (
-		if "%BranchVer%" == "false" (
-			echo %1 exists
-			echo %1\.git already existed, not updating at %time% %date% >> ExtensionLoader.log
-		) else (
-			pushd %1
+	if exist "extensions/%1/.git" (
+		if "%BranchVer%" NEQ "false" (
+			pushd "extensions/%1"
 			echo branching: %BranchVer% >>ExtensionLoader.log
-			echo @git.exe checkout -B %BranchVer% remotes/origin/%BranchVer% 
-			echo @git.exe checkout -B %BranchVer% remotes/origin/%BranchVer% >>ExtensionLoader.log
+			echo @git checkout -B %BranchVer% remotes/origin/%BranchVer% 
+			echo @git checkout -B %BranchVer% remotes/origin/%BranchVer% >>ExtensionLoader.log
 			@git.exe checkout -B %BranchVer% remotes/origin/%BranchVer% >>ExtensionLoader.log
 			popd
 		)
+	) else (
+		if "%BranchVer%" == "false" (
+			set CheckoutStatus=
+		) else (
+			set CheckoutStatus=-b %BranchVer%
+		)
+		echo CheckoutStatus: %CheckoutStatus%
+		Echo Adding Submodule %1
+		Echo Adding Submodule %1 >>ExtensionLoader.log
+		echo @git submodule add  %CheckoutStatus%  --force -- "ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki/extensions/%1.git"  "extensions/%1"
+		echo @git submodule add  %CheckoutStatus%  --force -- "ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki/extensions/%1.git"  "extensions/%1" >>ExtensionLoader.log
+		@git submodule add %CheckoutStatus% --force -- "ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki/extensions/%1.git" "extensions/%1"
+		if exist extensions/%1/.git (
+			call :gitreview %1
+		)
 	)
+	if not exist "extensions/%1/.git" (
+		mkdir extensions/%1
+		echo **** %1 is not in git **** trying svn
+		call :trySVN %1
+	)		
 goto :EOF
 
 :gitreview
-	copy "C:\Users\Jack D. Pond\Downloads\Git\commit-msg" %1\.git\hooks
-	pushd %1
+	copy "C:/Users/Jack D. Pond/Downloads/Git/commit-msg" extensions/%1/.git/hooks
+	pushd "extensions/%1"
 	call :onlyreview
 	popd
 goto :EOF
 
 :trySVN
-	@svn checkout svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/%1 %1
-	if exist %1\.svn (
+	@svn checkout svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/%1 extensions/%1
+	if exist "extensions/%1/.svn" (
 		echo loaded extension %1 with SVN >> ExtensionLoader.log
 	) else (
 		echo *** Error *** Could not load extension %1
