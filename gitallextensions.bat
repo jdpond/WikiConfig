@@ -70,7 +70,7 @@ goto :EOF
 goto :EOF
 
 :gitreview
-	copy "C:\Users\Jack D Pond\Downloads\Git\commit-msg" ".git\modules\extensions\%1\hooks"extensions\%1\.git\hooks"
+	copy "extensions\WkiConfig\commit-msg" ".git\modules\extensions\%1\hooks"extensions\%1\.git\hooks"
 	pushd "extensions/%1"
 	call :onlyreview
 	popd
