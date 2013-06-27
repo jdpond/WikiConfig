@@ -42,9 +42,9 @@ goto :EOF
 		if "%BranchVer%" NEQ "false" (
 			pushd "extensions/%1"
 			echo branching: %BranchVer% >>ExtensionLoader.log
-			echo @git checkout -B %BranchVer% remotes/origin/%BranchVer% 
-			echo @git checkout -B %BranchVer% remotes/origin/%BranchVer% >>ExtensionLoader.log
-			@git.exe checkout -B %BranchVer% remotes/origin/%BranchVer% >>ExtensionLoader.log
+			echo @git checkout -B %BranchVer% origin/%BranchVer% 
+			echo @git checkout -B %BranchVer% origin/%BranchVer% >>ExtensionLoader.log
+			@git checkout -B %BranchVer% origin/%BranchVer% >>ExtensionLoader.log
 			popd
 		)
 	) else (
@@ -57,8 +57,15 @@ goto :EOF
 		Echo Adding Submodule %1 >>ExtensionLoader.log
 		echo @git submodule add  %CheckoutStatus%  --force -- "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1"
 		echo @git submodule add  %CheckoutStatus%  --force -- "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1" >>ExtensionLoader.log
-		@git submodule add %CheckoutStatus% --force -- "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
+		@git clone -n "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
 		if exist extensions/%1/.git (
+			@git submodule add %CheckoutStatus% --force -- "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
+			pushd "extensions/%1"
+			echo branching: %BranchVer% >>ExtensionLoader.log
+			echo @git checkout -B %BranchVer% origin/%BranchVer% 
+			echo @git checkout -B %BranchVer% origin/%BranchVer% >>ExtensionLoader.log
+			@git checkout -B %BranchVer% origin/%BranchVer% >>ExtensionLoader.log
+			popd
 			call :gitreview %1
 		)
 	)
