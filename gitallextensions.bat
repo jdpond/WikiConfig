@@ -40,17 +40,17 @@ rem	set	SVNExtensionsAddr=svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/t
 goto :EOF
 
 :parseit
+	echo Processing Extension: %1
 	if exist "extensions/%1/.git" (
 		if "%BranchVer%" NEQ "false" (
-			pushd extensions/%1
-			git checkout "%BranchVer%" -- 
-			call :gitcheckout
+			pushd "extensions\%1"
+			git checkout %BranchVer%
 			popd
 		)
 	) else (
 		git clone -n "%ExtensionsAddr%/extensions/%1.git" "extensions/%1" >>"%ThisHomeDir%/ExtensionLoader.log"
 		if exist extensions/%1/.git (
-			pushd "extensions/%1"
+			pushd "extensions\%1"
 			echo git checkout -b %BranchVer% origin/%BranchVer% 
 			echo git checkout -b %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
 			git checkout -b %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
@@ -72,7 +72,7 @@ goto :EOF
 
 :gitreview
 	copy "extensions\WikiConfig\commit-msg" "extensions/%1/.git/hooks"
-	pushd "extensions/%1"
+	pushd "extensions\%1"
 	call :onlyreview
 	popd
 goto :EOF
