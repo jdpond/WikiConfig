@@ -1,7 +1,13 @@
  	@echo off
-	setlocal
+	setLocal EnableDelayedExpansion
+rem	set ExtensionsAddr=ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki
+rem	set	SVNExtensionsAddr=svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/trunk
+	set	SVNExtensionsAddr=http://svn.wikimedia.org/svnroot/mediawiki/trunk
+	set ExtensionsAddr=https://gerrit.wikimedia.org/r/p/mediawiki
+	set	SVNExtensionsAddr=http://svn.wikimedia.org/svnroot/mediawiki/trunk
 	set ConfigFile=extensions/WikiConfig/Extensions.conf
 	set BranchVer=false
+	
 :startloopp
 	if "%1"=="" goto loopparams
 	if "%1"=="-f" (
@@ -50,9 +56,9 @@ goto :EOF
 		echo CheckoutStatus: %CheckoutStatus%
 		Echo Adding Submodule %1
 		Echo Adding Submodule %1 >>ExtensionLoader.log
-		echo @git submodule add  %CheckoutStatus%  --force -- "ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki/extensions/%1.git"  "extensions/%1"
-		echo @git submodule add  %CheckoutStatus%  --force -- "ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki/extensions/%1.git"  "extensions/%1" >>ExtensionLoader.log
-		@git submodule add %CheckoutStatus% --force -- "ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki/extensions/%1.git" "extensions/%1"
+		echo @git submodule add  %CheckoutStatus%  --force -- "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1"
+		echo @git submodule add  %CheckoutStatus%  --force -- "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1" >>ExtensionLoader.log
+		@git submodule add %CheckoutStatus% --force -- "%ExtensionsAddr%i/extensions/%1.git" "extensions/%1"
 		if exist extensions/%1/.git (
 			call :gitreview %1
 		)
@@ -65,14 +71,14 @@ goto :EOF
 goto :EOF
 
 :gitreview
-	copy "C:/Users/Jack D. Pond/Downloads/Git/commit-msg" extensions/%1/.git/hooks
+	copy "C:\Users\Jack D Pond\Downloads\Git\commit-msg" extensions/%1/.git/hooks
 	pushd "extensions/%1"
 	call :onlyreview
 	popd
 goto :EOF
 
 :trySVN
-	@svn checkout svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/%1 extensions/%1
+	@svn checkout %SVNExtensionsAddr%/extensions/%1 extensions/%1
 	if exist "extensions/%1/.svn" (
 		echo loaded extension %1 with SVN >> ExtensionLoader.log
 	) else (
