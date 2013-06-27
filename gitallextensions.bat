@@ -8,6 +8,7 @@ rem	set	SVNExtensionsAddr=svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/t
 	set ConfigFile=extensions/WikiConfig/Extensions.conf
 	set BranchVer=false
 	set ThisHomeDir=%cd%
+	echo ThisHomeDir: %ThisHomeDir%
 	
 :startloopp
 	if "%1"=="" goto loopparams
@@ -41,32 +42,24 @@ goto :EOF
 :parseit
 	if exist "extensions/%1/.git" (
 		if "%BranchVer%" NEQ "false" (
-			pushd "extensions/%1"
-			echo branching: %BranchVer% >>ExtensionLoader.log
-			echo @git checkout -B %BranchVer% origin/%BranchVer% 
-			echo @git checkout -B %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
-			@git checkout -B %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
+			pushd extensions/%1
+			git checkout "%BranchVer%" -- 
+			call :gitcheckout
 			popd
 		)
 	) else (
-		if "%BranchVer%" == "false" (
-			set CheckoutStatus=
-		) else (
-			set CheckoutStatus=-b %BranchVer%
-		)
-		@git clone -n "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
+		git clone -n "%ExtensionsAddr%/extensions/%1.git" "extensions/%1" >>"%ThisHomeDir%/ExtensionLoader.log"
 		if exist extensions/%1/.git (
 			pushd "extensions/%1"
-			echo branching: %BranchVer% >>ExtensionLoader.log
-			echo @git checkout -B %BranchVer% origin/%BranchVer% 
-			echo @git checkout -B %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
-			@git checkout -B %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
+			echo git checkout -b %BranchVer% origin/%BranchVer% 
+			echo git checkout -b %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
+			git checkout -b %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
 			popd
 			Echo Adding Submodule %1
-			Echo Adding Submodule %1 >>ExtensionLoader.log
-			echo @git submodule add  %CheckoutStatus%  --force "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1"
-			echo @git submodule add  %CheckoutStatus%  --force "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1" >>"%ThisHomeDir%/ExtensionLoader.log"
-			@git submodule add %CheckoutStatus% --force "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
+			Echo Adding Submodule %1 >>"%ThisHomeDir%/ExtensionLoader.log
+			echo git submodule add --force "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
+			echo git submodule add --force "%ExtensionsAddr%/extensions/%1.git" "extensions/%1" >>"%ThisHomeDir%/ExtensionLoader.log"
+			git submodule add --force "%ExtensionsAddr%/extensions/%1.git" "extensions/%1" >>"%ThisHomeDir%/ExtensionLoader.log"
 			call :gitreview %1
 		)
 	)
@@ -78,7 +71,7 @@ goto :EOF
 goto :EOF
 
 :gitreview
-	copy "extensions\WikiConfig\commit-msg" ".git/modules/extensions/%1/hooks"
+	copy "extensions\WikiConfig\commit-msg" "extensions/%1/.git/hooks"
 	pushd "extensions/%1"
 	call :onlyreview
 	popd
@@ -86,7 +79,7 @@ goto :EOF
 
 :trySVN
 	Echo @svn checkout %SVNExtensionsAddr%/extensions/%1 extensions/%1
-	@svn checkout %SVNExtensionsAddr%/extensions/%1 extensions/%1
+	svn checkout %SVNExtensionsAddr%/extensions/%1 extensions/%1
 	if exist "extensions/%1/.svn" (
 		echo loaded extension %1 with SVN >> ExtensionLoader.log
 	) else (
@@ -96,7 +89,7 @@ goto :EOF
 goto :EOF
 
 :onlyreview
-	@git-review -s -r -origin
+	git-review -s -r -origin
 goto :EOF
 
 :ended
