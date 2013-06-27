@@ -7,6 +7,7 @@ rem	set	SVNExtensionsAddr=svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/t
 
 	set ConfigFile=extensions/WikiConfig/Extensions.conf
 	set BranchVer=false
+	set ThisHomeDir=%cd%
 	
 :startloopp
 	if "%1"=="" goto loopparams
@@ -31,7 +32,7 @@ rem	set	SVNExtensionsAddr=svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/t
 		echo Media Extension File List %ConfigFile% does not exist - exiting
 		goto :EOF
 	)
-	echo Starting MediaWiki Extension Loader from %ConfigFile% at %time% %date% > ExtensionLoader.log
+	echo Starting MediaWiki Extension Loader from %ConfigFile% at %time% %date% > "%ThisHomeDir%/ExtensionLoader.log"
 	set SVN_SSH="C:/Program Files (x86)/PuTTY/plink.exe"
 	for /f "eol=# delims=" %%f in (%ConfigFile%) do call :parseit %%f
 	pause
@@ -43,8 +44,8 @@ goto :EOF
 			pushd "extensions/%1"
 			echo branching: %BranchVer% >>ExtensionLoader.log
 			echo @git checkout -B %BranchVer% origin/%BranchVer% 
-			echo @git checkout -B %BranchVer% origin/%BranchVer% >>ExtensionLoader.log
-			@git checkout -B %BranchVer% origin/%BranchVer% >>ExtensionLoader.log
+			echo @git checkout -B %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
+			@git checkout -B %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
 			popd
 		)
 	) else (
@@ -53,19 +54,19 @@ goto :EOF
 		) else (
 			set CheckoutStatus=-b %BranchVer%
 		)
-		Echo Adding Submodule %1
-		Echo Adding Submodule %1 >>ExtensionLoader.log
-		echo @git submodule add  %CheckoutStatus%  --force -- "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1"
-		echo @git submodule add  %CheckoutStatus%  --force -- "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1" >>ExtensionLoader.log
 		@git clone -n "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
 		if exist extensions/%1/.git (
-			@git submodule add %CheckoutStatus% --force -- "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
 			pushd "extensions/%1"
 			echo branching: %BranchVer% >>ExtensionLoader.log
 			echo @git checkout -B %BranchVer% origin/%BranchVer% 
-			echo @git checkout -B %BranchVer% origin/%BranchVer% >>ExtensionLoader.log
-			@git checkout -B %BranchVer% origin/%BranchVer% >>ExtensionLoader.log
+			echo @git checkout -B %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
+			@git checkout -B %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
 			popd
+			Echo Adding Submodule %1
+			Echo Adding Submodule %1 >>ExtensionLoader.log
+			echo @git submodule add  %CheckoutStatus%  --force "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1"
+			echo @git submodule add  %CheckoutStatus%  --force "%ExtensionsAddr%/extensions/%1.git"  "extensions/%1" >>"%ThisHomeDir%/ExtensionLoader.log"
+			@git submodule add %CheckoutStatus% --force "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
 			call :gitreview %1
 		)
 	)
@@ -90,7 +91,7 @@ goto :EOF
 		echo loaded extension %1 with SVN >> ExtensionLoader.log
 	) else (
 		echo *** Error *** Could not load extension %1
-		echo *** Error *** Could not load extension %1 >> ExtensionLoader.log
+		echo *** Error *** Could not load extension %1 >> "%ThisHomeDir%/ExtensionLoader.log"
 	)
 goto :EOF
 
