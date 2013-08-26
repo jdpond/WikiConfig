@@ -72,8 +72,8 @@ goto :EOF
 			popd
 			Echo Adding Submodule !extension_name!
 			Echo Adding Submodule !extension_name! >>"!ThisHomeDir!/ExtensionLoader.log
-			echo git submodule add --force "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!"
-			echo git submodule add --force "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!" >>"!ThisHomeDir!/ExtensionLoader.log"
+			echo git submodule add -f "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!"
+			echo git submodule add -f "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!" >>"!ThisHomeDir!/ExtensionLoader.log"
 			git submodule add --force "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!" >>"!ThisHomeDir!/ExtensionLoader.log"
 			xcopy /F "extensions/WikiConfig/commit-msg" "extensions/!extension_name!/.git/hooks" >> NUL
 			pushd "extensions/!extension_name!"
