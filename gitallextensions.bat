@@ -46,12 +46,13 @@ rem	set	SVNExtensionsAddr=svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/t
 	)
 	echo Starting MediaWiki Extension Loader from %ConfigFile% at %time% %date% > "%ThisHomeDir%/ExtensionLoader.log"
 	set SVN_SSH="C:/Program Files (x86)/PuTTY/plink.exe"
-	for /f "eol=# delims=" %%f in (%ConfigFile%) do call :parseit %%f
+	for /f "eol=# delims=" %%f in (%ConfigFile%) do call :parseit "%%f"
 	pause
 goto :EOF
 
 :parseit
-	For /F "tokens=1* delims=:" %%a IN (%1) DO (
+	set extensionline=%1
+	For /F "tokens=1,2* delims=:" %%a IN (!extensionline!) DO (
 		set extension_name=%%a
 		set extension_rev=%%b
 	)
@@ -74,36 +75,28 @@ goto :EOF
 			echo git submodule add --force "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!"
 			echo git submodule add --force "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!" >>"!ThisHomeDir!/ExtensionLoader.log"
 			git submodule add --force "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!" >>"!ThisHomeDir!/ExtensionLoader.log"
-			call :gitreview !extension_name!
+			xcopy /F "extensions/WikiConfig/commit-msg" "extensions/!extension_name!/.git/hooks" >> NUL
+			pushd "extensions/!extension_name!"
+			git-review -s -r origin
+			popd
 		)
 	)
 	if not exist "extensions/!extension_name!/.git" (
 		mkdir extensions/%1
 		echo **** %1 is not in git **** trying svn
-		call :trySVN %1
+		call :trySVN !extensionline!
 	)		
 goto :EOF
 
-:gitreview
-	copy "extensions/WikiConfig/commit-msg" "extensions/%1/.git/hooks"
-	pushd "extensions/%1"
-	call :onlyreview
-	popd
-goto :EOF
-
 :trySVN
-	Echo @svn checkout %SVNExtensionsAddr%/extensions/%1 extensions/%1
-	svn checkout %SVNExtensionsAddr%/extensions/%1 extensions/%1
-	if exist "extensions/%1/.svn" (
-		echo loaded extension %1 with SVN >> ExtensionLoader.log
+	set svnextline=%1
+	set svnextline=!svnextline:~1,-1!
+	Echo @svn checkout "!SVNExtensionsAddr!/extensions/%1 extensions/!svnextline!"
+	svn checkout "!SVNExtensionsAddr!/extensions/%1 extensions/!svnextline!"
+	if exist "extensions/!svnextline!/.svn" (
+		echo loaded extension !svnextline! with SVN >> ExtensionLoader.log
 	) else (
 		echo *** Error *** Could not load extension %1
 		echo *** Error *** Could not load extension %1 >> "%ThisHomeDir%/ExtensionLoader.log"
 	)
 goto :EOF
-
-:onlyreview
-	git-review -s -r -origin
-goto :EOF
-
-:ended
