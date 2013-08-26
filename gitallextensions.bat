@@ -1,12 +1,23 @@
  	@echo off
 	setLocal EnableDelayedExpansion
+rem # @author Jack D. Pond
+rem @file
+rem @ingroup administrative
+rem @description Script file that adds extensions to mediawiki based on a list
+rem @param -a Action.Users.list, if not used, defaults to Action.User.list.temp
+rem       expects a file which contains one line per extension.  Each extension can have an explicit version - but will default to the specified
+rem       version if not present.
+rem       @param [extension]:[Version] (lines beginning with # are considered comments)
+rem       example
+rem       NSFileRepo:REL1_21
+
 rem	set ExtensionsAddr=ssh://jdpond@gerrit.wikimedia.org:29418/mediawiki
 rem	set	SVNExtensionsAddr=svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/trunk
 	set	SVNExtensionsAddr=http://svn.wikimedia.org/svnroot/mediawiki/trunk
 	set ExtensionsAddr=https://gerrit.wikimedia.org/r/p/mediawiki
 
 	set ConfigFile=extensions/WikiConfig/Extensions.conf
-	set BranchVer=false
+	set BranchVer=master
 	set ThisHomeDir=%cd%
 	echo ThisHomeDir: %ThisHomeDir%
 	
@@ -40,30 +51,33 @@ rem	set	SVNExtensionsAddr=svn+ssh://jdpond@svn.wikimedia.org/svnroot/mediawiki/t
 goto :EOF
 
 :parseit
-	echo Processing Extension: %1
-	if exist "extensions/%1/.git" (
-		if "%BranchVer%" NEQ "false" (
-			pushd "extensions\%1"
-			git checkout %BranchVer%
-			popd
-		)
+	For /F "tokens=1* delims=:" %%a IN (%1) DO (
+		set extension_name=%%a
+		set extension_rev=%%b
+	)
+	if "!extension_rev!" == "" ( set extension_rev=!BranchVer! )
+	echo Processing Extension: !extension_name!
+	if exist "extensions/!extension_name!/.git" (
+		pushd "extensions/!extension_name!"
+		git checkout !extension_rev!
+		popd
 	) else (
-		git clone -n "%ExtensionsAddr%/extensions/%1.git" "extensions/%1" >>"%ThisHomeDir%/ExtensionLoader.log"
-		if exist extensions/%1/.git (
-			pushd "extensions\%1"
-			echo git checkout -b %BranchVer% origin/%BranchVer% 
-			echo git checkout -b %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
-			git checkout -b %BranchVer% origin/%BranchVer% >>"%ThisHomeDir%/ExtensionLoader.log"
+		git clone -n "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!" >>"!ThisHomeDir!/ExtensionLoader.log"
+		if exist extensions/!extension_name!/.git (
+			pushd "extensions/!extension_name!"
+			echo git checkout -b !extension_rev! origin/!extension_rev! 
+			echo git checkout -b !extension_rev! origin/!extension_rev! >>"!ThisHomeDir!/ExtensionLoader.log"
+			git checkout -b !extension_rev! origin/!extension_rev! >>"!ThisHomeDir!/ExtensionLoader.log"
 			popd
-			Echo Adding Submodule %1
-			Echo Adding Submodule %1 >>"%ThisHomeDir%/ExtensionLoader.log
-			echo git submodule add --force "%ExtensionsAddr%/extensions/%1.git" "extensions/%1"
-			echo git submodule add --force "%ExtensionsAddr%/extensions/%1.git" "extensions/%1" >>"%ThisHomeDir%/ExtensionLoader.log"
-			git submodule add --force "%ExtensionsAddr%/extensions/%1.git" "extensions/%1" >>"%ThisHomeDir%/ExtensionLoader.log"
-			call :gitreview %1
+			Echo Adding Submodule !extension_name!
+			Echo Adding Submodule !extension_name! >>"!ThisHomeDir!/ExtensionLoader.log
+			echo git submodule add --force "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!"
+			echo git submodule add --force "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!" >>"!ThisHomeDir!/ExtensionLoader.log"
+			git submodule add --force "!ExtensionsAddr!/extensions/!extension_name!.git" "extensions/!extension_name!" >>"!ThisHomeDir!/ExtensionLoader.log"
+			call :gitreview !extension_name!
 		)
 	)
-	if not exist "extensions/%1/.git" (
+	if not exist "extensions/!extension_name!/.git" (
 		mkdir extensions/%1
 		echo **** %1 is not in git **** trying svn
 		call :trySVN %1
@@ -71,8 +85,8 @@ goto :EOF
 goto :EOF
 
 :gitreview
-	copy "extensions\WikiConfig\commit-msg" "extensions/%1/.git/hooks"
-	pushd "extensions\%1"
+	copy "extensions/WikiConfig/commit-msg" "extensions/%1/.git/hooks"
+	pushd "extensions/%1"
 	call :onlyreview
 	popd
 goto :EOF
