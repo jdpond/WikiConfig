@@ -15,18 +15,18 @@
 
 
 trySVN(){
-    Echo svn checkout "$SVNExtensionsAddr/extensions/$1 extensions/$1"
+    echo svn checkout "$SVNExtensionsAddr/extensions/$1 extensions/$1"
     svn checkout "$SVNExtensionsAddr/extensions/$1 extensions/$1"
-    if exist "extensions/$1/.svn" (
+    if [ -a "extensions/$1/.svn" ]; then
         echo loaded extension $1 with SVN >> ExtensionLoader.log
-    ) else (
+    else
         echo *** Error *** Could not load extension $1
         echo *** Error *** Could not load extension $1 >> "$ThisHomeDir/ExtensionLoader.log"
-    )
+    fi
 }
 
-export    SVNExtensionsAddr=http://svn.wikimedia.org/svnroot/mediawiki/trunk
-export ExtensionsAddr=https://gerrit.wikimedia.org/r/p/mediawiki
+export	SVNExtensionsAddr=http://svn.wikimedia.org/svnroot/mediawiki/trunk
+export	ExtensionsAddr=https://gerrit.wikimedia.org/r/p/mediawiki
 
 export ConfigFile=extensions/WikiConfig/Extensions.conf
 export BranchVer=master
@@ -63,33 +63,33 @@ while read line; do
         export _version=`echo $line | cut -s -d: -f2`
 		[ "$_version" == "" ] && export _version=$BranchVer
 		echo Processing Extension: $_extension
-		if exist "extensions/$_extension/.git" (
+		if [ -a "extensions/$_extension/.git" ]; then
 			pushd "extensions/$_extension"
 			git checkout $_version
 			popd
-		) else (
-			git clone -n "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >>"$ThisHomeDir/ExtensionLoader.log"
-			if exist extensions/$_extension/.git (
+		else
+			git clone -n "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >> "$ThisHomeDir/ExtensionLoader.log"
+			if [ -a extensions/$_extension/.git ];then
 				pushd "extensions/$_extension"
 				echo git checkout -b $_version origin/$_version 
-				echo git checkout -b $_version origin/$_version >>"$ThisHomeDir/ExtensionLoader.log"
-				git checkout -b $_version origin/$_version >>"$ThisHomeDir/ExtensionLoader.log"
+				echo git checkout -b $_version origin/$_version >> "$ThisHomeDir/ExtensionLoader.log"
+				git checkout -b $_version origin/$_version >> "$ThisHomeDir/ExtensionLoader.log"
 				popd
-				Echo Adding Submodule $_extension
-				Echo Adding Submodule $_extension >>"$ThisHomeDir/ExtensionLoader.log
+				echo Adding Submodule $_extension
+				echo Adding Submodule $_extension >> "$ThisHomeDir/ExtensionLoader.log"
 				echo git submodule add -f "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension"
-				echo git submodule add -f "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >>"$ThisHomeDir/ExtensionLoader.log"
-				git submodule add --force "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >>"$ThisHomeDir/ExtensionLoader.log"
+				echo git submodule add -f "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >> "$ThisHomeDir/ExtensionLoader.log"
+				git submodule add --force "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >> "$ThisHomeDir/ExtensionLoader.log"
 				pushd "extensions/$_extension"
 				git-review -s -r origin
 				popd
-			)
-		)
-		if not exist "extensions/$_extension/.git" (
+			fi
+		fi
+		if [ ! -a "extensions/$_extension/.git" ]; then
 			mkdir extensions/$_extension
 			echo **** $_extension is not in git **** trying svn
 			trySVN "$_extension" $_version
-		)   		
+		fi   		
 	fi
 done < $ConfigFile
 exit 0
