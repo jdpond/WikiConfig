@@ -3,7 +3,8 @@
 # @file
 # @ingroup administrative
 # @description Script file that adds extensions to mediawiki based on a list
-# @param -a Action.Users.list, if not used, defaults to Action.User.list.temp
+# @param -f configuration file, if not present, defaults to master
+# @param -b branch to be used, if not used, defaults to extensions/WikiConfig/Extensions.conf
 #       expects a file which contains one line per extension.  Each extension can have an explicit version - but will default to the specified
 #       version if not present.
 #       @param [extension]:[Version] (lines beginning with # are considered comments)
@@ -17,7 +18,7 @@
 trySVN(){
     echo svn checkout "$SVNExtensionsAddr/extensions/$1 extensions/$1"
     svn checkout "$SVNExtensionsAddr/extensions/$1 extensions/$1"
-    if [ -a "extensions/$1/.svn" ]; then
+    if [ -f "extensions/$1/.svn" ]; then
         echo loaded extension $1 with SVN >> ExtensionLoader.log
     else
         echo *** Error *** Could not load extension $1
@@ -52,7 +53,7 @@ while getopts ":f::b:" opt; do
     esac
 done
 
-if [ ! -a $ConfigFile ]; then
+if [ ! -f $ConfigFile ]; then
 	echo Media Extension File List $ConfigFile does not exist - exiting
 	exit 1
 fi
@@ -64,13 +65,13 @@ while read line; do
         export _version=`echo $line | cut -s -d: -f2`
 		[ "$_version" == "" ] && export _version=$BranchVer
 		echo Processing Extension: $_extension
-		if [ -a "extensions/$_extension/.git" ]; then
+		if [ -f "extensions/$_extension/.git" ]; then
 			pushd "extensions/$_extension"
 			git checkout $_version
 			popd
 		else
 			git clone -n "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >> "$ThisHomeDir/ExtensionLoader.log"
-			if [ -a extensions/$_extension/.git ];then
+			if [ -f extensions/$_extension/.git ];then
 				pushd "extensions/$_extension"
 				echo git checkout -b $_version origin/$_version 
 				echo git checkout -b $_version origin/$_version >> "$ThisHomeDir/ExtensionLoader.log"
@@ -86,7 +87,7 @@ while read line; do
 				popd
 			fi
 		fi
-		if [ ! -a "extensions/$_extension/.git" ]; then
+		if [ ! -f "extensions/$_extension/.git" ]; then
 			mkdir extensions/$_extension
 			echo **** $_extension is not in git **** trying svn
 			trySVN "$_extension" $_version
