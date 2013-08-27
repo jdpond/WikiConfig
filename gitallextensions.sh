@@ -55,7 +55,8 @@ done
 if [ ! -a $ConfigFile ]; then
 	echo Media Extension File List $ConfigFile does not exist - exiting
 	exit 1
-)
+fi
+
 echo Starting MediaWiki Extension Loader from $ConfigFile at $(hostname);$(date) > "$ThisHomeDir/ExtensionLoader.log"
 while read line; do
 	if [ "${line:0:1}" != "#" ] ; then
