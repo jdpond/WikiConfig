@@ -65,13 +65,13 @@ while read line; do
         export _version=`echo $line | cut -s -d: -f2`
 		[ "$_version" == "" ] && export _version=$BranchVer
 		echo "Processing Extension: $_extension"
-		if [ -f "extensions/$_extension/.git" ]; then
+		if [ -d "extensions/$_extension/.git" ]; then
 			pushd "extensions/$_extension"
 			git checkout $_version
 			popd
 		else
 			git clone -n "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >> "$ThisHomeDir/ExtensionLoader.log"
-			if [ -f extensions/$_extension/.git ];then
+			if [ -d extensions/$_extension/.git ];then
 				pushd "extensions/$_extension"
 				echo "git checkout -b $_version origin/$_version"
 				echo "git checkout -b $_version origin/$_version" >> "$ThisHomeDir/ExtensionLoader.log"
@@ -87,7 +87,7 @@ while read line; do
 				popd
 			fi
 		fi
-		if [ ! -f "extensions/$_extension/.git" ]; then
+		if [ ! -d "extensions/$_extension/.git" ]; then
 			mkdir extensions/$_extension
 			echo "**** $_extension is not in git **** trying svn"
 			trySVN "$_extension" $_version
