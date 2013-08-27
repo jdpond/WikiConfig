@@ -16,13 +16,13 @@
 
 
 trySVN(){
-    echo svn checkout "$SVNExtensionsAddr/extensions/$1 extensions/$1"
+    echo "svn checkout \"$SVNExtensionsAddr/extensions/$1 extensions/$1\""
     svn checkout "$SVNExtensionsAddr/extensions/$1 extensions/$1"
     if [ -f "extensions/$1/.svn" ]; then
-        echo loaded extension $1 with SVN >> ExtensionLoader.log
+        echo "loaded extension $1 with SVN" >> ExtensionLoader.log
     else
-        echo *** Error *** Could not load extension $1
-        echo *** Error *** Could not load extension $1 >> "$ThisHomeDir/ExtensionLoader.log"
+        echo "*** Error *** Could not load extension $1"
+        echo "*** Error *** Could not load extension $1" >> "$ThisHomeDir/ExtensionLoader.log"
     fi
 }
 
@@ -32,7 +32,7 @@ export	ExtensionsAddr=https://gerrit.wikimedia.org/r/p/mediawiki
 export ConfigFile=extensions/WikiConfig/Extensions.conf
 export BranchVer=master
 export ThisHomeDir=$(pwd)
-echo ThisHomeDir: $ThisHomeDir
+echo "ThisHomeDir: $ThisHomeDir"
 
 while getopts ":f::b:" opt; do
     case $opt in
@@ -54,17 +54,17 @@ while getopts ":f::b:" opt; do
 done
 
 if [ ! -f $ConfigFile ]; then
-	echo Media Extension File List $ConfigFile does not exist - exiting
+	echo "Media Extension File List $ConfigFile does not exist - exiting"
 	exit 1
 fi
 
-echo Starting MediaWiki Extension Loader from $ConfigFile at $(hostname);$(date) > "$ThisHomeDir/ExtensionLoader.log"
+echo "Starting MediaWiki Extension Loader from $ConfigFile at $(hostname) $(date)" > "$ThisHomeDir/ExtensionLoader.log"
 while read line; do
 	if [ "${line:0:1}" != "#" ] ; then
         export _extension=`echo $line | cut -d: -f1`
         export _version=`echo $line | cut -s -d: -f2`
 		[ "$_version" == "" ] && export _version=$BranchVer
-		echo Processing Extension: $_extension
+		echo "Processing Extension: $_extension"
 		if [ -f "extensions/$_extension/.git" ]; then
 			pushd "extensions/$_extension"
 			git checkout $_version
@@ -73,14 +73,14 @@ while read line; do
 			git clone -n "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >> "$ThisHomeDir/ExtensionLoader.log"
 			if [ -f extensions/$_extension/.git ];then
 				pushd "extensions/$_extension"
-				echo git checkout -b $_version origin/$_version 
-				echo git checkout -b $_version origin/$_version >> "$ThisHomeDir/ExtensionLoader.log"
-				git checkout -b $_version origin/$_version >> "$ThisHomeDir/ExtensionLoader.log"
+				echo "git checkout -b $_version origin/$_version"
+				echo "git checkout -b $_version origin/$_version" >> "$ThisHomeDir/ExtensionLoader.log"
+				git checkout -b "$_version origin/$_version" >> "$ThisHomeDir/ExtensionLoader.log"
 				popd
-				echo Adding Submodule $_extension
-				echo Adding Submodule $_extension >> "$ThisHomeDir/ExtensionLoader.log"
-				echo git submodule add -f "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension"
-				echo git submodule add -f "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >> "$ThisHomeDir/ExtensionLoader.log"
+				echo "Adding Submodule $_extension"
+				echo "Adding Submodule $_extension" >> "$ThisHomeDir/ExtensionLoader.log"
+				echo "git submodule add -f \"$ExtensionsAddr/extensions/$_extension.git\" \"extensions/$_extension\""
+				echo "git submodule add -f \"$ExtensionsAddr/extensions/$_extension.git\" \"extensions/$_extension\"" >> "$ThisHomeDir/ExtensionLoader.log"
 				git submodule add --force "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >> "$ThisHomeDir/ExtensionLoader.log"
 				pushd "extensions/$_extension"
 				git-review -s -r origin
@@ -89,7 +89,7 @@ while read line; do
 		fi
 		if [ ! -f "extensions/$_extension/.git" ]; then
 			mkdir extensions/$_extension
-			echo **** $_extension is not in git **** trying svn
+			echo "**** $_extension is not in git **** trying svn"
 			trySVN "$_extension" $_version
 		fi   		
 	fi
