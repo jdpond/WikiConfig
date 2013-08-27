@@ -64,7 +64,7 @@ while read line; do
         export _extension=`echo $line | cut -d: -f1`
         export _version=`echo $line | cut -s -d: -f2`
 		[ "$_version" == "" ] && export _version=$BranchVer
-		echo "Processing Extension: $_extension"
+		echo "Processing Extension: x$_extensionxgi"
 		if [ -d "extensions/$_extension/.git" ]; then
 			pushd "extensions/$_extension"
 			git checkout $_version
@@ -75,7 +75,7 @@ while read line; do
 				pushd "extensions/$_extension"
 				echo "git checkout -b $_version origin/$_version"
 				echo "git checkout -b $_version origin/$_version" >> "$ThisHomeDir/ExtensionLoader.log"
-				git checkout -b "$_version origin/$_version" >> "$ThisHomeDir/ExtensionLoader.log"
+				git checkout -b "$_version" "origin/$_version" >> "$ThisHomeDir/ExtensionLoader.log"
 				popd
 				echo "Adding Submodule $_extension"
 				echo "Adding Submodule $_extension" >> "$ThisHomeDir/ExtensionLoader.log"
