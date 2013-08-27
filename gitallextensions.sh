@@ -17,9 +17,10 @@
 
 trySVN(){
     echo "svn checkout \"$SVNExtensionsAddr/extensions/$1 extensions/$1\""
+    echo "svn checkout \"$SVNExtensionsAddr/extensions/$1 extensions/$1\"" >> "$ThisHomeDir/ExtensionLoader.log"
     svn checkout "$SVNExtensionsAddr/extensions/$1 extensions/$1"
     if [ -f "extensions/$1/.svn" ]; then
-        echo "loaded extension $1 with SVN" >> ExtensionLoader.log
+        echo "loaded extension $1 with SVN" >> "$ThisHomeDir/ExtensionLoader.log"
     else
         echo "*** Error *** Could not load extension $1"
         echo "*** Error *** Could not load extension $1" >> "$ThisHomeDir/ExtensionLoader.log"
@@ -91,6 +92,7 @@ while read line; do
 		if [ ! -d "extensions/$_extension/.git" ]; then
 			mkdir extensions/$_extension
 			echo "**** $_extension is not in git **** trying svn"
+			echo "**** $_extension is not in git **** trying svn" >> "$ThisHomeDir/ExtensionLoader.log"
 			trySVN "$_extension" $_version
 		fi   		
 	fi
