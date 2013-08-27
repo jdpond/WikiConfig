@@ -64,7 +64,7 @@ while read line; do
         export _extension=`echo $line | cut -d: -f1`
         export _version=`echo $line | cut -s -d: -f2`
 		[ "$_version" == "" ] && export _version=$BranchVer
-		echo "Processing Extension: x$_extensionxgi"
+		echo "Processing Extension: $_extension"
 		if [ -d "extensions/$_extension/.git" ]; then
 			pushd "extensions/$_extension"
 			git checkout $_version
