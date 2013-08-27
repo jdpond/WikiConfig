@@ -82,9 +82,10 @@ while read line; do
 				echo "git submodule add -f \"$ExtensionsAddr/extensions/$_extension.git\" \"extensions/$_extension\""
 				echo "git submodule add -f \"$ExtensionsAddr/extensions/$_extension.git\" \"extensions/$_extension\"" >> "$ThisHomeDir/ExtensionLoader.log"
 				git submodule add --force "$ExtensionsAddr/extensions/$_extension.git" "extensions/$_extension" >> "$ThisHomeDir/ExtensionLoader.log"
-				pushd "extensions/$_extension"
-				git-review -s -r origin
-				popd
+# only valid if using ssh
+#				pushd "extensions/$_extension"
+#				git-review -s -r origin
+#				popd
 			fi
 		fi
 		if [ ! -d "extensions/$_extension/.git" ]; then
