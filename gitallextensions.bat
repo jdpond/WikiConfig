@@ -82,8 +82,8 @@ goto :EOF
 		)
 	)
 	if not exist "extensions/!extension_name!/.git" (
-		mkdir extensions/%1
-		echo **** %1 is not in git **** trying svn
+		mkdir extensions/!extension_name!
+		echo **** !extension_name! is not in git **** trying svn
 		call :trySVN !extensionline!
 	)		
 goto :EOF
@@ -97,6 +97,6 @@ goto :EOF
 		echo loaded extension !svnextline! with SVN >> ExtensionLoader.log
 	) else (
 		echo *** Error *** Could not load extension %1
-		echo *** Error *** Could not load extension %1 >> "%ThisHomeDir%/ExtensionLoader.log"
+		echo *** Error *** Could not load extension %1 >> "!ThisHomeDir!/ExtensionLoader.log"
 	)
 goto :EOF
