@@ -72,7 +72,7 @@ require_once("$IP/extensions/NewUserNotif/NewUserNotif.php");
 require_once("$IP/extensions/ConditionalShowSection/ConditionalShowSection.php");
 #require_once("$IP/extensions/DiscussionThreading/DiscussionThreading.php");
 require_once("$IP/extensions/ParserFunctions/ParserFunctions.php");
-require_once ("$IP/extensions/StringFunctions/StringFunctions.php");
+# require_once ("$IP/extensions/StringFunctions/StringFunctions.php");
 $wgPFEnableStringFunctions = true;
 require_once ("$IP/extensions/StringFunctionsEscaped/StringFunctionsEscaped.php");
 require_once("$IP/extensions/NSFileRepo/NSFileRepo.php");
