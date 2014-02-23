@@ -3,7 +3,10 @@ if (!defined('MEDIAWIKI')) die();
 
 # Validator
 require_once("$IP/extensions/Validator/Validator.php");
-$wgImageMagickConvertCommand='C:/Program Files/ImageMagick/convert.exe';
+
+// For WIndows ImageMagickConvert
+//
+// $wgImageMagickConvertCommand='C:/Program Files/ImageMagick/convert.exe';
 
 ## Default skin: you can change the default skin. Use the internal symbolic
 ## names, ie 'standard', 'nostalgia', 'cologneblue', 'monobook':
