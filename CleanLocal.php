@@ -63,9 +63,18 @@ $wgVectorUseIconWatch = true; //Enable star icon to add/remove page from watchli
 
 // UsabilityInitiative/WikiEditor
 require_once("$IP/extensions/WikiEditor/WikiEditor.php");
-$wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;  // Default user preference to use toolbar dialogs
 $wgWikiEditorModules['toolbar']['global'] = true;  // Enable the WikiEditor toolbar for everyone
 $wgWikiEditorModules['toolbar']['user'] = false;  // Don't allow users to turn the WikiEditor toolbar on/off individually
+# Enables use of WikiEditor by default but still allow users to disable it in preferences
+$wgDefaultUserOptions['usebetatoolbar'] = 1;
+$wgDefaultUserOptions['usebetatoolbar-cgd'] = 1;
+
+# Displays the Preview and Changes tabs
+$wgDefaultUserOptions['wikieditor-preview'] = 1;
+
+# Displays the Publish and Cancel buttons on the top right side
+$wgDefaultUserOptions['wikieditor-publish'] = 1;
+# require_once("$IP/extensions/LiquidThreads/LiquidThreads.php");
 
 # require_once("$IP/extensions/LiquidThreads/LiquidThreads.php");
 
