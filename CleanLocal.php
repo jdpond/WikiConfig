@@ -86,7 +86,7 @@ require_once( "$IP/extensions/SemanticFormsInputs/SemanticFormsInputs.php" );
 
 #OpenID Setup
 define('Auth_OpenID_RAND_SOURCE', null);
-require_once( "$IP/extensions/OpenID/OpenID.setup.php" );
+require_once( "$IP/extensions/OpenID/OpenID.php" );
 
 $wgWhitelistRead[] = "Special:OpenIDLogin";
 $wgGroupPermissions['*']['viewedittab']=false;
