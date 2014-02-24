@@ -70,7 +70,7 @@ $wgWikiEditorModules['toolbar']['user'] = false;  // Don't allow users to turn t
 # require_once("$IP/extensions/LiquidThreads/LiquidThreads.php");
 
 require_once( "$IP/extensions/ExternalData/ExternalData.php" );
-require_once( "$IP/extensions/ArrayExtension/ArrayExtension.php" );
+require_once( "$IP/extensions/Arrays/Arrays.php" );
 require_once( "$IP/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php" );
 #require_once( "$IP/extensions/Calendar/Calendar.php" );
 #require_once( "$IP/extensions/PdfBook/PdfBook.php" );
